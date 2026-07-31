@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Hospital Management Dashboard</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>🏥 Hospital Management Dashboard</h1>
+    <div id="summary" class="summary-cards"></div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="patients">Patients</button>
+    <button class="tab-btn" data-tab="doctors">Doctors</button>
+    <button class="tab-btn" data-tab="rooms">Rooms</button>
+    <button class="tab-btn" data-tab="appointments">Appointments</button>
+  </nav>
+
+  <main>
+    <input type="text" id="search" placeholder="Search this table...">
+    <div id="tableContainer"></div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
