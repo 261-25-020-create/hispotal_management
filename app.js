@@ -8,7 +8,7 @@ const state = {
   },
 };
 
-// Maps dashboard tabs to your repo's CSV file paths
+// Maps dashboard tabs to CSV file paths
 const csvFiles = {
   patients: "./data/1_Patient.csv",
   doctors: "./data/2_Doctor.csv",
@@ -16,23 +16,23 @@ const csvFiles = {
   rooms: "./data/4_Room.csv",
 };
 
-// Keys matching exact CSV header names
+// Exact key names matching CSV headers across all tabs
 const columns = {
   patients: [
-    { key: "ID", label: "ID" },
-    { key: "First Name", label: "First Name" },
-    { key: "Last Name", label: "Last Name" },
-    { key: "DOB", label: "DOB" },
+    { key: "PatientID", label: "ID" },
+    { key: "FirstName", label: "First Name" },
+    { key: "LastName", label: "Last Name" },
+    { key: "DateOfBirth", label: "DOB" },
     { key: "Gender", label: "Gender" },
-    { key: "Contact", label: "Contact" },
-    { key: "Room", label: "Room" },
+    { key: "ContactNumber", label: "Contact" },
+    { key: "RoomNumber", label: "Room" },
   ],
   doctors: [
-    { key: "ID", label: "ID" },
-    { key: "First Name", label: "First Name" },
-    { key: "Last Name", label: "Last Name" },
+    { key: "DoctorID", label: "ID" },
+    { key: "FirstName", label: "First Name" },
+    { key: "LastName", label: "Last Name" },
     { key: "Specialization", label: "Specialization" },
-    { key: "Contact", label: "Contact" },
+    { key: "ContactNumber", label: "Contact" },
     {
       key: "Salary",
       label: "Salary",
@@ -45,12 +45,11 @@ const columns = {
     },
   ],
   rooms: [
-    { key: "ID", label: "ID" },
-    { key: "Room #", label: "Room #" },
-    { key: "Type", label: "Type" },
+    { key: "RoomNumber", label: "Room #" },
+    { key: "RoomType", label: "Type" },
     { key: "Status", label: "Status", badge: true },
     {
-      key: "Rent",
+      key: "RentPerDay",
       label: "Rent",
       format: (v) => {
         if (!v) return "";
@@ -61,17 +60,18 @@ const columns = {
     },
   ],
   appointments: [
-    { key: "ID", label: "ID" },
-    { key: "Patient ID", label: "Patient ID" },
-    { key: "Doctor ID", label: "Doctor ID" },
-    { key: "Date", label: "Date" },
+    { key: "AppointmentID", label: "ID" },
+    { key: "PatientID (FK)", label: "Patient ID" },
+    { key: "DoctorID (FK)", label: "Doctor ID" },
+    { key: "AppointmentDate", label: "Date" },
     { key: "Type", label: "Type" },
     { key: "Status", label: "Status", badge: true },
   ],
 };
 
-// Helper: Split single CSV line respecting quotes
+// Helper: Split single CSV line respecting commas and tabs
 function splitCSVLine(line) {
+  const delimiter = line.includes("\t") ? "\t" : ",";
   const result = [];
   let current = "";
   let inQuotes = false;
@@ -80,7 +80,7 @@ function splitCSVLine(line) {
     const char = line[i];
     if (char === '"' || char === "'") {
       inQuotes = !inQuotes;
-    } else if (char === "," && !inQuotes) {
+    } else if (char === delimiter && !inQuotes) {
       result.push(current.trim().replace(/^["']|["']$/g, ""));
       current = "";
     } else {
@@ -113,7 +113,7 @@ function parseCSV(text) {
   });
 }
 
-// Loads CSV file for a given tab
+// Fetch CSV file for a given tab
 async function fetchTabData(tab) {
   try {
     const res = await fetch(csvFiles[tab]);
@@ -126,7 +126,7 @@ async function fetchTabData(tab) {
   }
 }
 
-// Computes summary counts and vacant rooms
+// Summary card metrics computation
 async function loadSummary() {
   for (const tab of ["patients", "doctors", "rooms", "appointments"]) {
     if (state.data[tab].length === 0) {
@@ -136,7 +136,7 @@ async function loadSummary() {
 
   const vacantRooms = state.data.rooms.filter((r) => {
     const statusVal = String(r["Status"] || r["status"] || "").trim().toLowerCase();
-    return statusVal === "vacant";
+    return statusVal === "vacant" || statusVal === "available";
   }).length;
 
   document.getElementById("summary").innerHTML = `
@@ -172,6 +172,7 @@ function renderTable(tab, rows) {
   }
 
   const thead = `<thead><tr>${cols.map((c) => `<th>${c.label}</th>`).join("")}</tr></thead>`;
+
   const tbody = `<tbody>${filtered
     .map(
       (row) =>
