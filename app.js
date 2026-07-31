@@ -33,14 +33,33 @@ const columns = {
     { key: "Last Name", label: "Last Name" },
     { key: "Specialization", label: "Specialization" },
     { key: "Contact", label: "Contact" },
-    { key: "Salary", label: "Salary", format: (v) => (v ? "$" + Number(v).toLocaleString() : "") },
+    { 
+      key: "Salary", 
+      label: "Salary", 
+      format: (v) => {
+        if (!v) return "";
+        // Remove commas or dollar signs before converting to Number
+        const cleaned = String(v).replace(/[^0-9.-]+/g, "");
+        const num = Number(cleaned);
+        return isNaN(num) ? v : "$" + num.toLocaleString();
+      } 
+    },
   ],
   rooms: [
     { key: "ID", label: "ID" },
     { key: "Room #", label: "Room #" },
     { key: "Type", label: "Type" },
     { key: "Status", label: "Status", badge: true },
-    { key: "Rent", label: "Rent", format: (v) => (v ? "$" + Number(v).toLocaleString() : "") },
+    { 
+      key: "Rent", 
+      label: "Rent", 
+      format: (v) => {
+        if (!v) return "";
+        const cleaned = String(v).replace(/[^0-9.-]+/g, "");
+        const num = Number(cleaned);
+        return isNaN(num) ? v : "$" + num.toLocaleString();
+      } 
+    },
   ],
   appointments: [
     { key: "ID", label: "ID" },
@@ -54,7 +73,8 @@ const columns = {
 
 // Helper function to parse CSV raw text into JS array of objects
 function parseCSV(text) {
-  const lines = text.trim().split("\n");
+  // Normalize Windows (\r\n) and Unix (\n) line endings
+  const lines = text.replace(/\r/g, "").trim().split("\n");
   if (lines.length < 2) return [];
   const headers = lines[0].split(",").map((h) => h.trim());
 
@@ -112,8 +132,7 @@ async function loadTab(tab) {
 function renderTable(tab, rows) {
   const cols = columns[tab];
   const query = document.getElementById("search").value.trim().toLowerCase();
-  
-  // Filter rows based on search query matching any property value
+
   const filtered = query
     ? rows.filter((r) =>
         Object.values(r).some((v) => String(v).toLowerCase().includes(query))
@@ -133,7 +152,7 @@ function renderTable(tab, rows) {
       (row) =>
         `<tr>${cols
           .map((c) => {
-            const raw = row[c.key] || "";
+            const raw = row[c.key] !== undefined ? row[c.key] : "";
             const value = c.format ? c.format(raw) : raw;
             if (c.badge) {
               return `<td><span class="badge ${String(raw).toLowerCase()}">${value}</span></td>`;
