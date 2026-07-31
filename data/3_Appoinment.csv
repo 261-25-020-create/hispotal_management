@@ -1,0 +1,31 @@
+﻿AppointmentID,PatientID (FK),DoctorID (FK),AppointmentDate,Type,Status
+A001,P001,D101,8/1/2024,Checkup,Completed
+A002,P002,D102,8/5/2024,Consultation,Pending
+A003,P003,D101,8/10/2024,Follow-up,Completed
+A004,P004,D103,8/15/2024,Initial Visit,Pending
+A005,P005,D102,8/16/2024,Review,Completed
+A006,P006,D101,8/20/2024,Checkup,Inpatient
+A007,P007,D103,8/25/2024,Consultation,Active
+A008,P008,D102,9/1/2024,Follow-up,Pending
+A009,P009,D101,9/5/2024,Checkup,Active
+A010,P010,D103,9/10/2024,Consultation,Inpatient
+A011,P011,D101,9/15/2024,Checkup,Active
+A012,P012,D102,9/20/2024,Follow-up,Pending
+A013,P013,D101,9/25/2024,Checkup,Active
+A014,P014,D103,10/1/2024,Consultation,Inpatient
+A015,P015,D102,10/5/2024,Review,Active
+A016,P016,D101,10/10/2024,Follow-up,Pending
+A017,P017,D103,10/15/2024,Checkup,Active
+A018,P018,D102,10/20/2024,Consultation,Inpatient
+A019,P019,D101,10/25/2024,Checkup,Active
+A020,P020,D103,11/1/2024,Consultation,Pending
+A021,P021,D101,11/5/2024,Checkup,Active
+A022,P022,D102,11/10/2024,Review,Inpatient
+A023,P023,D103,11/15/2024,Consultation,Active
+A024,P024,D101,11/20/2024,Checkup,Pending
+A025,P025,D102,11/25/2024,Follow-up,Active
+A026,P026,D103,12/1/2024,Consultation,Inpatient
+A027,P027,D101,12/5/2024,Checkup,Active
+A028,P028,D102,12/10/2024,Review,Pending
+A029,P029,D103,12/15/2024,Consultation,Active
+A030,P030,D101,12/20/2024,Checkup,Inpatient
