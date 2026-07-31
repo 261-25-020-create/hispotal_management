@@ -1,6 +1,11 @@
 const state = {
   tab: "patients",
-  data: { patients: [], doctors: [], rooms: [], appointments: [] },
+  data: {
+    patients: [],
+    doctors: [],
+    rooms: [],
+    appointments: [],
+  },
 };
 
 const columns = {
@@ -61,7 +66,11 @@ function renderTable(tab, rows) {
   const cols = columns[tab];
   const query = document.getElementById("search").value.trim().toLowerCase();
   const filtered = query
-    ? rows.filter((r) => Object.values(r).some((v) => String(v).toLowerCase().includes(query)))
+    ? rows.filter((r) =>
+        Object.values(r).some((v) =>
+          String(v).toLowerCase().includes(query)
+        )
+      )
     : rows;
 
   const container = document.getElementById("tableContainer");
