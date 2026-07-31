@@ -16,7 +16,7 @@ const csvFiles = {
   rooms: "./data/4_Room.csv",
 };
 
-// Keys updated to match exact CSV header names
+// Keys matching exact CSV header names
 const columns = {
   patients: [
     { key: "ID", label: "ID" },
@@ -33,16 +33,15 @@ const columns = {
     { key: "Last Name", label: "Last Name" },
     { key: "Specialization", label: "Specialization" },
     { key: "Contact", label: "Contact" },
-    { 
-      key: "Salary", 
-      label: "Salary", 
+    {
+      key: "Salary",
+      label: "Salary",
       format: (v) => {
         if (!v) return "";
-        // Remove commas or dollar signs before converting to Number
         const cleaned = String(v).replace(/[^0-9.-]+/g, "");
         const num = Number(cleaned);
         return isNaN(num) ? v : "$" + num.toLocaleString();
-      } 
+      },
     },
   ],
   rooms: [
@@ -50,15 +49,15 @@ const columns = {
     { key: "Room #", label: "Room #" },
     { key: "Type", label: "Type" },
     { key: "Status", label: "Status", badge: true },
-    { 
-      key: "Rent", 
-      label: "Rent", 
+    {
+      key: "Rent",
+      label: "Rent",
       format: (v) => {
         if (!v) return "";
         const cleaned = String(v).replace(/[^0-9.-]+/g, "");
         const num = Number(cleaned);
         return isNaN(num) ? v : "$" + num.toLocaleString();
-      } 
+      },
     },
   ],
   appointments: [
@@ -71,18 +70,44 @@ const columns = {
   ],
 };
 
-// Helper function to parse CSV raw text into JS array of objects
+// Helper: Split single CSV line respecting quotes
+function splitCSVLine(line) {
+  const result = [];
+  let current = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    if (char === '"' || char === "'") {
+      inQuotes = !inQuotes;
+    } else if (char === "," && !inQuotes) {
+      result.push(current.trim().replace(/^["']|["']$/g, ""));
+      current = "";
+    } else {
+      current += char;
+    }
+  }
+  result.push(current.trim().replace(/^["']|["']$/g, ""));
+  return result;
+}
+
+// Robust CSV parser function
 function parseCSV(text) {
-  // Normalize Windows (\r\n) and Unix (\n) line endings
-  const lines = text.replace(/\r/g, "").trim().split("\n");
+  const lines = text
+    .replace(/\r/g, "")
+    .split("\n")
+    .map((l) => l.trim())
+    .filter((l) => l.length > 0);
+
   if (lines.length < 2) return [];
-  const headers = lines[0].split(",").map((h) => h.trim());
+
+  const headers = splitCSVLine(lines[0]);
 
   return lines.slice(1).map((line) => {
-    const values = line.split(",").map((v) => v.trim());
+    const values = splitCSVLine(line);
     const obj = {};
     headers.forEach((header, i) => {
-      obj[header] = values[i] || "";
+      obj[header] = values[i] !== undefined ? values[i] : "";
     });
     return obj;
   });
@@ -101,18 +126,18 @@ async function fetchTabData(tab) {
   }
 }
 
-// Computes metrics directly from fetched tab datasets
+// Computes summary counts and vacant rooms
 async function loadSummary() {
-  // Pre-fetch all datasets if not loaded
   for (const tab of ["patients", "doctors", "rooms", "appointments"]) {
     if (state.data[tab].length === 0) {
       state.data[tab] = await fetchTabData(tab);
     }
   }
 
-  const vacantRooms = state.data.rooms.filter(
-    (r) => String(r.Status || r.status).toLowerCase() === "vacant"
-  ).length;
+  const vacantRooms = state.data.rooms.filter((r) => {
+    const statusVal = String(r["Status"] || r["status"] || "").trim().toLowerCase();
+    return statusVal === "vacant";
+  }).length;
 
   document.getElementById("summary").innerHTML = `
     <div class="card"><div class="value">${state.data.patients.length}</div><div class="label">Patients</div></div>
@@ -155,7 +180,7 @@ function renderTable(tab, rows) {
             const raw = row[c.key] !== undefined ? row[c.key] : "";
             const value = c.format ? c.format(raw) : raw;
             if (c.badge) {
-              return `<td><span class="badge ${String(raw).toLowerCase()}">${value}</span></td>`;
+              return `<td><span class="badge ${String(raw).trim().toLowerCase()}">${value}</span></td>`;
             }
             return `<td>${value}</td>`;
           })
