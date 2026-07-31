@@ -45,11 +45,12 @@ const columns = {
     },
   ],
   rooms: [
+    { key: "RoomID", label: "Room ID" },
     { key: "RoomNumber", label: "Room #" },
-    { key: "RoomType", label: "Type" },
+    { key: "Type", label: "Type" },
     { key: "Status", label: "Status", badge: true },
     {
-      key: "RentPerDay",
+      key: "Rent",
       label: "Rent",
       format: (v) => {
         if (!v) return "";
