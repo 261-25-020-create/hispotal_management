@@ -16,38 +16,39 @@ const csvFiles = {
   rooms: "./data/4_Room.csv",
 };
 
+// Keys updated to match exact CSV header names
 const columns = {
   patients: [
-    { key: "id", label: "ID" },
-    { key: "firstName", label: "First Name" },
-    { key: "lastName", label: "Last Name" },
-    { key: "dateOfBirth", label: "DOB" },
-    { key: "gender", label: "Gender" },
-    { key: "contactNumber", label: "Contact" },
-    { key: "roomNumber", label: "Room" },
+    { key: "ID", label: "ID" },
+    { key: "First Name", label: "First Name" },
+    { key: "Last Name", label: "Last Name" },
+    { key: "DOB", label: "DOB" },
+    { key: "Gender", label: "Gender" },
+    { key: "Contact", label: "Contact" },
+    { key: "Room", label: "Room" },
   ],
   doctors: [
-    { key: "id", label: "ID" },
-    { key: "firstName", label: "First Name" },
-    { key: "lastName", label: "Last Name" },
-    { key: "specialization", label: "Specialization" },
-    { key: "contactNumber", label: "Contact" },
-    { key: "salary", label: "Salary", format: (v) => "$" + Number(v).toLocaleString() },
+    { key: "ID", label: "ID" },
+    { key: "First Name", label: "First Name" },
+    { key: "Last Name", label: "Last Name" },
+    { key: "Specialization", label: "Specialization" },
+    { key: "Contact", label: "Contact" },
+    { key: "Salary", label: "Salary", format: (v) => (v ? "$" + Number(v).toLocaleString() : "") },
   ],
   rooms: [
-    { key: "id", label: "ID" },
-    { key: "roomNumber", label: "Room #" },
-    { key: "type", label: "Type" },
-    { key: "status", label: "Status", badge: true },
-    { key: "rent", label: "Rent", format: (v) => "$" + Number(v).toLocaleString() },
+    { key: "ID", label: "ID" },
+    { key: "Room #", label: "Room #" },
+    { key: "Type", label: "Type" },
+    { key: "Status", label: "Status", badge: true },
+    { key: "Rent", label: "Rent", format: (v) => (v ? "$" + Number(v).toLocaleString() : "") },
   ],
   appointments: [
-    { key: "id", label: "ID" },
-    { key: "patientId", label: "Patient ID" },
-    { key: "doctorId", label: "Doctor ID" },
-    { key: "date", label: "Date" },
-    { key: "type", label: "Type" },
-    { key: "status", label: "Status", badge: true },
+    { key: "ID", label: "ID" },
+    { key: "Patient ID", label: "Patient ID" },
+    { key: "Doctor ID", label: "Doctor ID" },
+    { key: "Date", label: "Date" },
+    { key: "Type", label: "Type" },
+    { key: "Status", label: "Status", badge: true },
   ],
 };
 
@@ -90,7 +91,7 @@ async function loadSummary() {
   }
 
   const vacantRooms = state.data.rooms.filter(
-    (r) => String(r.status).toLowerCase() === "vacant"
+    (r) => String(r.Status || r.status).toLowerCase() === "vacant"
   ).length;
 
   document.getElementById("summary").innerHTML = `
@@ -111,6 +112,8 @@ async function loadTab(tab) {
 function renderTable(tab, rows) {
   const cols = columns[tab];
   const query = document.getElementById("search").value.trim().toLowerCase();
+  
+  // Filter rows based on search query matching any property value
   const filtered = query
     ? rows.filter((r) =>
         Object.values(r).some((v) => String(v).toLowerCase().includes(query))
